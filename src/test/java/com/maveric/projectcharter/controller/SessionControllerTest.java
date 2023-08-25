@@ -37,9 +37,12 @@ class SessionControllerTest {
     @Mock
     private DeleteArchiveResponse deleteArchiveResponse;
 
+    @Mock
+    private GetResponse<SessionResponseDTO> getResponse;
+
     @Test
     void testCreateSession_Success() {
-        SessionRequestDTO sessionRequestDTO = mock(SessionRequestDTO.class);
+        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
         when(sessionService.saveSession(sessionRequestDTO)).thenReturn(sessionResponseDTO);
         ResponseEntity<CreateUpdateResponse> result = sessionController.createSession(sessionRequestDTO);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
@@ -48,41 +51,38 @@ class SessionControllerTest {
 
     @Test
     void testCreateSession_CustomerNotFound() {
-        SessionRequestDTO sessionRequestDTO = mock(SessionRequestDTO.class);
+        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
         doThrow(new ApiRequestException("Customer is not found")).when(sessionService).saveSession(sessionRequestDTO);
         assertThrows(ApiRequestException.class, () -> sessionController.createSession(sessionRequestDTO));
         verify(createUpdateResponse, never()).setMessage("Session created successfully");
         verify(createUpdateResponse, never()).setHttpStatus(HttpStatus.CREATED);
     }
 
-    /*@Test
+    @Test
     void testGetSessions() {
         String status = "A";
         int offset = 0;
         int pageSize = 10;
-        SessionStatus sessionStatus = SessionStatus.A;
         Page<SessionResponseDTO> sessionPage = mock(Page.class);
-        when(sessionService.getSessions(sessionStatus, offset, pageSize)).thenReturn(sessionPage);
-        ResponseEntity<Page<SessionResponseDTO>> result = sessionController.getSessions(status, offset, pageSize);
+        when(sessionService.getSessions(status, offset, pageSize)).thenReturn(sessionPage);
+        ResponseEntity<GetResponse<SessionResponseDTO>> result = sessionController.getSessions(status, offset, pageSize);
         assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(sessionPage, result.getBody());
         assertNotNull(result);
-    }*/
+    }
 
     @Test
     void testGetSessions_SessionNotFound() {
         String status = "A";
         int offset = 0;
         int pageSize = 10;
-        SessionStatus sessionStatus = SessionStatus.A;
-        doThrow(new ApiRequestException("No session found")).when(sessionService).getSessions(sessionStatus, offset, pageSize);
+        doThrow(new ApiRequestException("Wrong ")).when(sessionService).getSessions(status, offset, pageSize);
         assertThrows(ApiRequestException.class, () -> sessionController.getSessions(status, offset, pageSize));
     }
 
     @Test
     void testUpdateSession() {
         String sessionId = "session123";
-        SessionRequestDTO sessionRequestDTO = mock(SessionRequestDTO.class);
+        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
         when(sessionService.updateSession(sessionId,sessionRequestDTO)).thenReturn(sessionResponseDTO);
         ResponseEntity<CreateUpdateResponse> result = sessionController.updateSession(sessionId, sessionRequestDTO);
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -92,7 +92,7 @@ class SessionControllerTest {
     @Test
     void testUpdateSession_ApiRequestException() {
         String sessionId = "session123";
-        SessionRequestDTO sessionRequestDTO = mock(SessionRequestDTO.class);
+        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
         doThrow(new ApiRequestException("No session found")).when(sessionService).updateSession(sessionId,sessionRequestDTO);
         assertThrows(ApiRequestException.class, () -> sessionController.updateSession(sessionId, sessionRequestDTO));
         verify(createUpdateResponse, never()).setMessage("Session Updated");
@@ -135,5 +135,14 @@ class SessionControllerTest {
         assertThrows(ApiRequestException.class, () -> sessionController.archiveSession(sessionId));
         verify(deleteArchiveResponse, never()).setMessage("Session Archived");
         verify(deleteArchiveResponse, never()).setHttpStatus(HttpStatus.OK);
+    }
+
+    public SessionRequestDTO createSessionRequestDto(){
+        SessionRequestDTO sessionRequestDTO = new SessionRequestDTO();
+        sessionRequestDTO.setSessionName("Test Session");
+        sessionRequestDTO.setCustomerId("CB0001");
+        sessionRequestDTO.setRemarks("Open RD");
+        sessionRequestDTO.setCreatedBy("Matthew");
+        return sessionRequestDTO;
     }
 }

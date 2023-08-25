@@ -2,11 +2,11 @@ package com.maveric.projectcharter.controller;
 
 import com.maveric.projectcharter.config.Constants;
 import com.maveric.projectcharter.dto.*;
-import com.maveric.projectcharter.entity.SessionStatus;
 import com.maveric.projectcharter.exception.ApiRequestException;
+import com.maveric.projectcharter.exception.ServiceException;
 import com.maveric.projectcharter.service.SessionService;
 import jakarta.validation.Valid;
-import org.hibernate.service.spi.ServiceException;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -40,18 +40,13 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @PostMapping
-    public ResponseEntity<CreateUpdateResponse> createSession(@RequestBody @Valid SessionRequestDTO sessionRequestDTO) {
-        try {
-            SessionResponseDTO sessionResponseDTO = sessionService.saveSession(sessionRequestDTO);
-            createUpdateResponse.setMessage(Constants.CREATED);
-            createUpdateResponse.setHttpStatus(HttpStatus.CREATED);
-            createUpdateResponse.setSessionResponseDTO(sessionResponseDTO);
-            return new ResponseEntity<>(createUpdateResponse,HttpStatus.CREATED);
-        } catch (ApiRequestException e) {
-            throw new ApiRequestException(e.getMessage());
-        } catch (ServiceException e) {
-            throw new ServiceException(e.getMessage());
-        }
+    public ResponseEntity<CreateUpdateResponse> createSession(@RequestBody @Valid SessionRequestDTO sessionRequestDTO)
+            throws ApiRequestException, ServiceException {
+        SessionResponseDTO sessionResponseDTO = sessionService.saveSession(sessionRequestDTO);
+        createUpdateResponse.setMessage(Constants.CREATED);
+        createUpdateResponse.setHttpStatus(HttpStatus.CREATED);
+        createUpdateResponse.setSessionResponseDTO(sessionResponseDTO);
+        return new ResponseEntity<>(createUpdateResponse, HttpStatus.CREATED);
     }
 
     /**
@@ -67,22 +62,13 @@ public class SessionController {
     @GetMapping("/{status}")
     public ResponseEntity<GetResponse<SessionResponseDTO>> getSessions
     (@PathVariable String status, @RequestParam(name = "pageNo", defaultValue = "0") int offset,
-     @RequestParam(name = "pageSize", defaultValue = "5") int pageSize) {
-        try {
-            if(!(status.equalsIgnoreCase("A")||status.equalsIgnoreCase("X"))){
-                throw new ApiRequestException(Constants.WRONG_STATUS);
-            }
-            SessionStatus sessionStatus = SessionStatus.valueOf(status.toUpperCase());
-            Page<SessionResponseDTO> sessionResponseDTOPage = sessionService.getSessions(sessionStatus, offset, pageSize);
-            getResponse.setTotalElements(sessionResponseDTOPage.getTotalElements());
-            getResponse.setTotalPages(sessionResponseDTOPage.getTotalPages());
-            getResponse.setSession(sessionResponseDTOPage.getContent());
-            return new ResponseEntity<>(getResponse, HttpStatus.OK);
-        } catch (ApiRequestException e) {
-            throw new ApiRequestException(e.getMessage());
-        } catch (ServiceException e) {
-            throw new ServiceException(e.getMessage());
-        }
+     @RequestParam(name = "pageSize", defaultValue = "5") int pageSize)
+            throws ApiRequestException, ServiceException {
+        Page<SessionResponseDTO> sessionResponseDTOPage = sessionService.getSessions(status, offset, pageSize);
+        getResponse.setTotalElements(sessionResponseDTOPage.getTotalElements());
+        getResponse.setTotalPages(sessionResponseDTOPage.getTotalPages());
+        getResponse.setSession(sessionResponseDTOPage.getContent());
+        return new ResponseEntity<>(getResponse, HttpStatus.OK);
     }
 
     /**
@@ -95,18 +81,13 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @PutMapping("/{sessionId}")
-    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable String sessionId, @RequestBody @Valid SessionRequestDTO sessionRequestDTO) {
-        try {
-            SessionResponseDTO sessionResponseDTO = sessionService.updateSession(sessionId, sessionRequestDTO);
-            createUpdateResponse.setMessage(Constants.UPDATED);
-            createUpdateResponse.setHttpStatus(HttpStatus.OK);
-            createUpdateResponse.setSessionResponseDTO(sessionResponseDTO);
-            return new ResponseEntity<>(createUpdateResponse, HttpStatus.OK);
-        } catch (ApiRequestException e) {
-            throw new ApiRequestException(e.getMessage());
-        } catch (ServiceException e) {
-            throw new ServiceException(e.getMessage());
-        }
+    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable @NotNull String sessionId, @RequestBody @Valid SessionRequestDTO sessionRequestDTO)
+            throws ApiRequestException, ServiceException {
+        SessionResponseDTO sessionResponseDTO = sessionService.updateSession(sessionId, sessionRequestDTO);
+        createUpdateResponse.setMessage(Constants.UPDATED);
+        createUpdateResponse.setHttpStatus(HttpStatus.OK);
+        createUpdateResponse.setSessionResponseDTO(sessionResponseDTO);
+        return new ResponseEntity<>(createUpdateResponse, HttpStatus.OK);
     }
 
     /**
@@ -118,15 +99,10 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @DeleteMapping("/{sessionId}")
-    public ResponseEntity<DeleteArchiveResponse> deleteSession(@PathVariable String sessionId) {
-        try {
-            deleteArchiveResponse = sessionService.deleteSession(sessionId);
-            return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
-        } catch (ApiRequestException e) {
-            throw new ApiRequestException(e.getMessage());
-        } catch (ServiceException e) {
-            throw new ServiceException(e.getMessage());
-        }
+    public ResponseEntity<DeleteArchiveResponse> deleteSession(@PathVariable @NotNull String sessionId)
+            throws ApiRequestException, ServiceException {
+        deleteArchiveResponse = sessionService.deleteSession(sessionId);
+        return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
     }
 
     /**
@@ -138,14 +114,9 @@ public class SessionController {
      * @throws ServiceException    If there is an issue with the service while archiving the session.
      */
     @PutMapping("/archive/{sessionId}")
-    public ResponseEntity<DeleteArchiveResponse>  archiveSession(@PathVariable String sessionId) {
-        try {
-            deleteArchiveResponse = sessionService.archiveSession(sessionId);
-            return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
-        } catch (ApiRequestException e) {
-            throw new ApiRequestException(e.getMessage());
-        } catch (ServiceException e) {
-            throw new ServiceException(e.getMessage());
-        }
+    public ResponseEntity<DeleteArchiveResponse> archiveSession(@PathVariable @NotNull String sessionId)
+            throws ApiRequestException, ServiceException {
+        deleteArchiveResponse = sessionService.archiveSession(sessionId);
+        return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
     }
 }

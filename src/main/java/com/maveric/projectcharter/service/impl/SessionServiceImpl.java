@@ -10,21 +10,23 @@ import com.maveric.projectcharter.entity.Session;
 import com.maveric.projectcharter.entity.SessionHistory;
 import com.maveric.projectcharter.entity.SessionStatus;
 import com.maveric.projectcharter.exception.ApiRequestException;
+import com.maveric.projectcharter.exception.ServiceException;
 import com.maveric.projectcharter.repository.CustomerRepository;
 import com.maveric.projectcharter.repository.SessionHistoryRepository;
 import com.maveric.projectcharter.repository.SessionRepository;
 import com.maveric.projectcharter.service.SessionService;
 import lombok.AllArgsConstructor;
-import org.hibernate.service.spi.ServiceException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionException;
 
 import java.time.LocalDateTime;
 
@@ -49,6 +51,11 @@ public class SessionServiceImpl implements SessionService {
 
     private final int maximumDormantDays;
     private final String sortSessionsBy;
+
+    public SessionServiceImpl() {
+        this.maximumDormantDays = 10;
+        this.sortSessionsBy = "updatedOn";
+    }
 
     @Autowired
     public SessionServiceImpl(@Value("${maximumDormantDays}") int maximumDormantDays,
@@ -75,7 +82,8 @@ public class SessionServiceImpl implements SessionService {
             SessionResponseDTO sessionResponseDTO = modelMapper.map(savedSession, SessionResponseDTO.class);
             sessionResponseDTO.setArchiveFlag(ArchiveFlag.N);
             return sessionResponseDTO;
-        } catch (ServiceException e) {
+        }
+        catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());
         }
     }
@@ -83,7 +91,7 @@ public class SessionServiceImpl implements SessionService {
     /**
      * Retrieves sessions by pagination based on the provided session status, offset, and page size.
      *
-     * @param sessionStatus The status of sessions to retrieve.
+     * @param status The status of sessions to retrieve.
      * @param offset        The starting index of the page.
      * @param pagesize      The number of items to retrieve per page.
      * @return A Page of SessionResponseDTO objects containing paginated session information.
@@ -91,10 +99,13 @@ public class SessionServiceImpl implements SessionService {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @Override
-    public Page<SessionResponseDTO> getSessions(SessionStatus sessionStatus, int offset, int pagesize) {
+    public Page<SessionResponseDTO> getSessions(String status, int offset, int pagesize) {
 
         try {
-            System.out.println("_____"+sortSessionsBy);
+            if(!(status.equalsIgnoreCase(Constants.SESSION_STATUS_A)||status.equalsIgnoreCase(Constants.SESSION_STATUS_X))){
+                throw new ApiRequestException(Constants.WRONG_STATUS);
+            }
+            SessionStatus sessionStatus = SessionStatus.valueOf(status.toUpperCase());
             Pageable pageable = PageRequest.of(offset, pagesize)
                     .withSort(Sort.by(sortSessionsBy).descending());
             Page<Session> sessions = sessionRepository.findByStatus(sessionStatus, pageable);
@@ -113,11 +124,12 @@ public class SessionServiceImpl implements SessionService {
                     }
                 }
                 else {
-                    session.setArchiveFlag(ArchiveFlag.Y);
+                    session.setArchiveFlag(ArchiveFlag.NA);
                 }
             });
             return sessionResponseDTOS;
-        } catch (ServiceException e) {
+        }
+        catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());
         }
 
@@ -151,8 +163,8 @@ public class SessionServiceImpl implements SessionService {
             SessionResponseDTO sessionResponseDTO = modelMapper.map(updatedSession, SessionResponseDTO.class);
             sessionResponseDTO.setArchiveFlag(ArchiveFlag.N);
             return sessionResponseDTO;
-
-        } catch (ServiceException e) {
+        }
+        catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());
         }
     }
@@ -180,8 +192,8 @@ public class SessionServiceImpl implements SessionService {
             deleteArchiveResponse.setMessage(Constants.DELETED);
             deleteArchiveResponse.setHttpStatus(HttpStatus.OK);
             return deleteArchiveResponse;
-
-        } catch (ServiceException e) {
+        }
+        catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());
         }
     }
@@ -206,7 +218,8 @@ public class SessionServiceImpl implements SessionService {
             deleteArchiveResponse.setMessage(Constants.ARCHIVED);
             deleteArchiveResponse.setHttpStatus(HttpStatus.OK);
             return deleteArchiveResponse;
-        } catch (ServiceException e) {
+        }
+        catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());
         }
     }

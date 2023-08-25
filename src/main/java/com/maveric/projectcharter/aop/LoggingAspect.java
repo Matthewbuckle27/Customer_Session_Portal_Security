@@ -1,5 +1,6 @@
-package com.maveric.projectcharter.advice;
+package com.maveric.projectcharter.aop;
 
+import com.maveric.projectcharter.config.Constants;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
@@ -17,38 +18,38 @@ public class LoggingAspect {
 
     @Before("execution(* com.maveric.projectcharter.controller.*.*(..))")
     public void logBeforeControllerMethod(JoinPoint joinPoint) {
-        logger.info("Executing: " + joinPoint.getSignature().toShortString());
+        logger.info(Constants.EXECUTING + joinPoint.getSignature().toShortString());
     }
 
     @AfterReturning(pointcut = "execution(* com.maveric.projectcharter.controller.*.*(..))", returning = "result")
     public void logAfterControllerMethod(Object result) {
-        logger.info("Response: " + result.toString());
+        logger.info(Constants.RESPONSE + result.toString());
     }
 
     @AfterThrowing(pointcut = "execution(* com.maveric.projectcharter.controller.*.*(..))", throwing = "ex")
     public void logExceptionInController(JoinPoint joinPoint, Exception ex) {
-        logger.error("Exception in: " + joinPoint.getSignature().toShortString() + ". Exception: " + ex.getMessage());
+        logger.error(Constants.EXCEPTION_IN + joinPoint.getSignature().toShortString() + Constants.EXCEPTION + ex.getMessage());
     }
 
     @Before("execution(* com.maveric.projectcharter.service.*.*(..))")
     public void logBeforeServiceMethod(JoinPoint joinPoint) {
-        logger.info("Executing: " + joinPoint.getSignature().toShortString());
+        logger.info(Constants.EXECUTING + joinPoint.getSignature().toShortString());
     }
 
     @AfterReturning(pointcut = "execution(* com.maveric.projectcharter.service.*.*(..))", returning = "result")
     public void logAfterServiceMethod(Object result) {
-        logger.info("Response: " + result.toString());
+        logger.info(Constants.RESPONSE + result.toString());
     }
 
     @AfterThrowing(pointcut = "execution(* com.maveric.projectcharter.service.*.*(..))", throwing = "ex")
     public void logExceptionInService(JoinPoint joinPoint, Exception ex) {
-        logger.error("Exception in: " + joinPoint.getSignature().toShortString() + ". Exception: " + ex.getMessage());
+        logger.error(Constants.EXCEPTION_IN + joinPoint.getSignature().toShortString() + Constants.EXCEPTION + ex.getMessage());
     }
 
-    private void logMethodArguments(JoinPoint joinPoint) {
+    public void logMethodArguments(JoinPoint joinPoint) {
         Object[] args = joinPoint.getArgs();
         for (Object arg : args) {
-            logger.info("Request Argument: " + arg.toString());
+            logger.info(Constants.ARGUMENT + arg.toString());
         }
     }
 }

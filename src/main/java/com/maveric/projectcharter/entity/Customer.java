@@ -2,6 +2,7 @@ package com.maveric.projectcharter.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
@@ -13,6 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Customer {
 
     @Id
@@ -25,4 +27,5 @@ public class Customer {
     private String email;
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
     private List<Session> sessions;
+
 }

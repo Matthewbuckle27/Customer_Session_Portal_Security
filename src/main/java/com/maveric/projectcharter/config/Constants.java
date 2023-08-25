@@ -16,4 +16,12 @@ public class Constants {
     public static final String QUERY_SESSION = "SELECT MAX(CAST(SUBSTRING(session_id, 8) AS UNSIGNED)) FROM session";
     public static final String PREFIX_CUSTOMER = "CB";
     public static final String QUERY_CUSTOMER = "SELECT MAX(CAST(SUBSTRING(customer_id, 3) AS UNSIGNED)) FROM customer";
+    public static final String SESSION_STATUS_A = "A";
+    public static final String SESSION_STATUS_X = "X";
+    public static final String EXECUTING = "Executing: ";
+    public static final String RESPONSE = "Response: ";
+    public static final String EXCEPTION_IN = "Exception in: ";
+    public static final String EXCEPTION = ". Exception: ";
+    public static final String ARGUMENT = "Request Argument: ";
+
 }
