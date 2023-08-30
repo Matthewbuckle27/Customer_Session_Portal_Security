@@ -211,6 +211,7 @@ public class SessionServiceImpl implements SessionService {
                 LocalDateTime archiveDate = updatedOn.plusDays(maximumDormantDays);
                 if (archiveDate.isBefore(LocalDateTime.now())) {
                     session.setStatus(SessionStatus.X);
+                    session.setUpdatedOn(LocalDateTime.now());
                     sessionRepository.save(session);
                     deleteArchiveResponse.setMessage(Constants.ARCHIVED);
                     deleteArchiveResponse.setHttpStatus(HttpStatus.OK);
