@@ -1,7 +1,6 @@
 package com.maveric.projectcharter.controller;
 
 import com.maveric.projectcharter.dto.*;
-import com.maveric.projectcharter.entity.SessionStatus;
 import com.maveric.projectcharter.exception.ApiRequestException;
 import com.maveric.projectcharter.service.SessionService;
 import org.junit.jupiter.api.Test;
@@ -82,9 +81,11 @@ class SessionControllerTest {
     @Test
     void testUpdateSession() {
         String sessionId = "session123";
-        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
-        when(sessionService.updateSession(sessionId,sessionRequestDTO)).thenReturn(sessionResponseDTO);
-        ResponseEntity<CreateUpdateResponse> result = sessionController.updateSession(sessionId, sessionRequestDTO);
+        UpdateSessionRequestDto updateSessionRequestDto = new UpdateSessionRequestDto();
+        updateSessionRequestDto.setSessionName("Updated Session Name");
+        updateSessionRequestDto.setRemarks("Updated Remarks");
+        when(sessionService.updateSession(sessionId,updateSessionRequestDto)).thenReturn(sessionResponseDTO);
+        ResponseEntity<CreateUpdateResponse> result = sessionController.updateSession(sessionId, updateSessionRequestDto);
         assertEquals(HttpStatus.OK, result.getStatusCode());
         assertNotNull(result);
     }
@@ -92,9 +93,9 @@ class SessionControllerTest {
     @Test
     void testUpdateSession_ApiRequestException() {
         String sessionId = "session123";
-        SessionRequestDTO sessionRequestDTO = createSessionRequestDto();
-        doThrow(new ApiRequestException("No session found")).when(sessionService).updateSession(sessionId,sessionRequestDTO);
-        assertThrows(ApiRequestException.class, () -> sessionController.updateSession(sessionId, sessionRequestDTO));
+        UpdateSessionRequestDto updateSessionRequestDto = new UpdateSessionRequestDto();
+        doThrow(new ApiRequestException("No session found")).when(sessionService).updateSession(sessionId,updateSessionRequestDto);
+        assertThrows(ApiRequestException.class, () -> sessionController.updateSession(sessionId, updateSessionRequestDto));
         verify(createUpdateResponse, never()).setMessage("Session Updated");
         verify(createUpdateResponse, never()).setHttpStatus(HttpStatus.OK);
     }

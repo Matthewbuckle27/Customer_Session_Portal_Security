@@ -23,5 +23,7 @@ public class Constants {
     public static final String EXCEPTION_IN = "Exception in: ";
     public static final String EXCEPTION = ". Exception: ";
     public static final String ARGUMENT = "Request Argument: ";
-
+    public static final String NOT_ELIGIBLE_TO_ARCHIVE = "Session is not eligible to archive";
+    public static final String CANNOT_ARCHIVE = "Cannot Archive Session";
+    public static final String CUSTOMER_CREATED = "Customer Created";
 }

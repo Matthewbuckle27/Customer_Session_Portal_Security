@@ -1,9 +1,6 @@
 package com.maveric.projectcharter.service;
 
-import com.maveric.projectcharter.dto.ArchiveFlag;
-import com.maveric.projectcharter.dto.DeleteArchiveResponse;
-import com.maveric.projectcharter.dto.SessionRequestDTO;
-import com.maveric.projectcharter.dto.SessionResponseDTO;
+import com.maveric.projectcharter.dto.*;
 import com.maveric.projectcharter.entity.Customer;
 import com.maveric.projectcharter.entity.Session;
 import com.maveric.projectcharter.entity.SessionHistory;
@@ -100,7 +97,7 @@ class SessionServiceTest {
         when(modelMapper.map(session, SessionResponseDTO.class)).thenReturn(sessionResponseDTO);
         SessionResponseDTO result = sessionService.saveSession(sessionRequestDTO);
         assertNotNull(result);
-        assertEquals(ArchiveFlag.N,result.getArchiveFlag());
+        assertEquals(ArchiveFlag.N, result.getArchiveFlag());
     }
 
     @Test
@@ -116,12 +113,10 @@ class SessionServiceTest {
     }
 
     @Test
-    void testUpdateSession(){
-        SessionRequestDTO sessionRequestDTO = SessionRequestDTO.builder()
-                .sessionName("Test Session")
-                .customerId("CB00001")
+    void testUpdateSession() {
+        UpdateSessionRequestDto updateSessionRequestDto = UpdateSessionRequestDto.builder()
+                .sessionName("Test Updated Session")
                 .remarks("Open RD")
-                .createdBy("Gowtham")
                 .build();
         Session session = Session.builder()
                 .sessionId("Session000123")
@@ -136,45 +131,28 @@ class SessionServiceTest {
                 .archiveFlag(ArchiveFlag.N)
                 .build();
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
-        when(customerRepository.findById(anyString())).thenReturn(Optional.of(customer));
         when(sessionRepository.save(session)).thenReturn(session);
         when(modelMapper.map(session, SessionResponseDTO.class)).thenReturn(sessionResponseDTO);
-        SessionResponseDTO dto = sessionService.updateSession(anyString(), sessionRequestDTO);
+        SessionResponseDTO dto = sessionService.updateSession(anyString(), updateSessionRequestDto);
         assertNotNull(dto);
         verify(sessionRepository, times(1)).save(any());
     }
 
     @Test
-    void testUpdateSession_SessionNotFound(){
-        SessionRequestDTO sessionRequestDTO = SessionRequestDTO.builder()
-                .sessionName("Test Session")
-                .customerId("CB00001")
+    void testUpdateSession_SessionNotFound() {
+        UpdateSessionRequestDto updateSessionRequestDto = UpdateSessionRequestDto.builder()
+                .sessionName("Test Updated Session")
                 .remarks("Open RD")
-                .createdBy("Gowtham")
                 .build();
         when(sessionRepository.findById(anyString())).thenReturn(Optional.empty());
-        assertThrows(ApiRequestException.class, () -> sessionService.updateSession(anyString(), sessionRequestDTO));
+        assertThrows(ApiRequestException.class, () -> sessionService.updateSession(anyString(), updateSessionRequestDto));
     }
 
     @Test
-    void testUpdateSession_CustomerNotFound(){
-        SessionRequestDTO sessionRequestDTO = SessionRequestDTO.builder()
-                .sessionName("Test Session")
-                .customerId("CB00001")
+    void testUpdateSession_CannotUpdate() {
+        UpdateSessionRequestDto updateSessionRequestDto = UpdateSessionRequestDto.builder()
+                .sessionName("Test Updated Session")
                 .remarks("Open RD")
-                .createdBy("Gowtham")
-                .build();
-        when(customerRepository.findById(anyString())).thenReturn(Optional.empty());
-        assertThrows(ApiRequestException.class, () -> sessionService.updateSession(anyString(), sessionRequestDTO));
-    }
-
-    @Test
-    void testUpdateSession_CannotUpdate(){
-        SessionRequestDTO sessionRequestDTO = SessionRequestDTO.builder()
-                .sessionName("Test Session")
-                .customerId("CB00001")
-                .remarks("Open RD")
-                .createdBy("Gowtham")
                 .build();
         Session session = Session.builder()
                 .sessionId("Session000123")
@@ -183,8 +161,7 @@ class SessionServiceTest {
                 .status(SessionStatus.X)
                 .build();
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
-        when(customerRepository.findById(anyString())).thenReturn(Optional.of(customer));
-        assertThrows(ApiRequestException.class, () -> sessionService.updateSession(anyString(),sessionRequestDTO));
+        assertThrows(ApiRequestException.class, () -> sessionService.updateSession(anyString(), updateSessionRequestDto));
     }
 
     @Test
@@ -212,7 +189,7 @@ class SessionServiceTest {
     }
 
     @Test
-    void testDeleteSession_SessionNotFound(){
+    void testDeleteSession_SessionNotFound() {
         when(sessionRepository.findById(anyString())).thenReturn(Optional.empty());
         assertThrows(ApiRequestException.class, () -> sessionService.deleteSession(anyString()));
     }
@@ -240,10 +217,11 @@ class SessionServiceTest {
     }
 
     @Test
-    void testArchiveSession(){
+    void testArchiveSession() {
         Session session = Session.builder()
                 .sessionId("Session000123")
                 .sessionName("Test Session")
+                .updatedOn(LocalDateTime.parse("2023-08-12T14:52:01.733428"))
                 .customer(customer)
                 .status(SessionStatus.A)
                 .build();
@@ -255,13 +233,26 @@ class SessionServiceTest {
     }
 
     @Test
-    void testArchiveSession_SessionNotFound(){
+    void testArchiveSession_NotEligible() {
+        Session session = Session.builder()
+                .sessionId("Session000123")
+                .sessionName("Test Session")
+                .updatedOn(LocalDateTime.parse("2023-08-28T14:52:01.733428"))
+                .customer(customer)
+                .status(SessionStatus.A)
+                .build();
+        when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
+        assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
+    }
+
+    @Test
+    void testArchiveSession_SessionNotFound() {
         when(sessionRepository.findById(anyString())).thenReturn(Optional.empty());
         assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
     }
 
     @Test
-    void testArchiveSession_SessionAlreadyArchived(){
+    void testArchiveSession_SessionAlreadyArchived() {
         Session session = Session.builder()
                 .sessionId("Session000123")
                 .sessionName("Test Session")
@@ -271,45 +262,4 @@ class SessionServiceTest {
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
         assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
     }
-
-  /*  @Test
-    void testGetSession(){
-        SessionStatus sessionStatus = SessionStatus.A;
-        int offset = 0;
-        int pageSize = 10;
-        Pageable pageable = PageRequest.of(offset, pageSize);
-        Session session1 = Session.builder()
-                .sessionId("Session0001")
-                .sessionName("Test Session")
-                .status(SessionStatus.A)
-                .build();
-        Session session2 = Session.builder()
-                .sessionId("Session0002")
-                .sessionName("Test Session")
-                .status(SessionStatus.A)
-                .build();
-        List<Session> sessionList = new ArrayList<>();
-        sessionList.add(session1);
-        sessionList.add(session2);
-        Page<Session> mockSessionPage = new PageImpl<>(sessionList, pageable, sessionList.size());
-        SessionResponseDTO sessionResponseDTO1 = SessionResponseDTO.builder()
-                .sessionId("Session0001")
-                .sessionName("Test Session")
-                .status(SessionStatus.A)
-                .build();
-        SessionResponseDTO sessionResponseDTO2 = SessionResponseDTO.builder()
-                .sessionId("Session0002")
-                .sessionName("Test Session")
-                .status(SessionStatus.A)
-                .build();
-        List<SessionResponseDTO> sessionResponseDTOList = new ArrayList<>();
-        sessionResponseDTOList.add(sessionResponseDTO1);
-        sessionResponseDTOList.add(sessionResponseDTO2);
-        Page<SessionResponseDTO> mockSessionResponseDTOPage = new PageImpl<>(sessionResponseDTOList, pageable, sessionResponseDTOList.size());
-        when(PageRequest.of(offset,pageSize).withSort(Sort.by(anyString()).descending())).thenReturn((PageRequest) pageable);
-        when(sessionRepository.findByStatus(sessionStatus, pageable)).thenReturn(mockSessionPage);
-        when(mockSessionPage.map(session -> modelMapper.map(session,SessionResponseDTO.class))).thenReturn(mockSessionResponseDTOPage);
-        Page<SessionResponseDTO> result = sessionService.getSessions(sessionStatus, offset, pageSize);
-        assertEquals(2, result.getContent().size());
-    }*/
 }

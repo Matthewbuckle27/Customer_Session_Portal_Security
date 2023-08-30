@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @Validated
 @RequestMapping("/sessions")
@@ -75,15 +76,15 @@ public class SessionController {
      * Controller method to update a session identified by the provided session ID.
      *
      * @param sessionId         The ID of the session to be updated.
-     * @param sessionRequestDTO The data to update the session with, in the form of a SessionRequestDTO.
+     * @param updateSessionRequestDto The data to update the session with, in the form of a SessionRequestDTO.
      * @return A ResponseEntity containing a CustomResponse with details about the operation's outcome.
      * @throws ApiRequestException If there is an issue with the API request.
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @PutMapping("/{sessionId}")
-    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable @NotNull String sessionId, @RequestBody @Valid SessionRequestDTO sessionRequestDTO)
+    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable @NotNull String sessionId, @RequestBody @Valid UpdateSessionRequestDto updateSessionRequestDto)
             throws ApiRequestException, ServiceException {
-        SessionResponseDTO sessionResponseDTO = sessionService.updateSession(sessionId, sessionRequestDTO);
+        SessionResponseDTO sessionResponseDTO = sessionService.updateSession(sessionId, updateSessionRequestDto);
         createUpdateResponse.setMessage(Constants.UPDATED);
         createUpdateResponse.setHttpStatus(HttpStatus.OK);
         createUpdateResponse.setSessionResponseDTO(sessionResponseDTO);
@@ -119,4 +120,5 @@ public class SessionController {
         deleteArchiveResponse = sessionService.archiveSession(sessionId);
         return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
     }
+
 }

@@ -1,10 +1,7 @@
 package com.maveric.projectcharter.service.impl;
 
 import com.maveric.projectcharter.config.Constants;
-import com.maveric.projectcharter.dto.ArchiveFlag;
-import com.maveric.projectcharter.dto.DeleteArchiveResponse;
-import com.maveric.projectcharter.dto.SessionRequestDTO;
-import com.maveric.projectcharter.dto.SessionResponseDTO;
+import com.maveric.projectcharter.dto.*;
 import com.maveric.projectcharter.entity.Customer;
 import com.maveric.projectcharter.entity.Session;
 import com.maveric.projectcharter.entity.SessionHistory;
@@ -139,25 +136,21 @@ public class SessionServiceImpl implements SessionService {
      * Update a session identified by the provided session ID using the information from the given SessionRequestDTO.
      *
      * @param sessionId         The ID of the session to be updated.
-     * @param sessionRequestDTO The data to update the session with, encapsulated in a SessionRequestDTO.
+     * @param updateSessionRequestDto The data to update the session with, encapsulated in a SessionRequestDTO.
      * @return The SessionResponseDTO containing the updated session's details.
      * @throws ApiRequestException If the session or customer is not found, or if there's an issue with the API request.
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @Override
-    public SessionResponseDTO updateSession(String sessionId, SessionRequestDTO sessionRequestDTO) {
+    public SessionResponseDTO updateSession(String sessionId, UpdateSessionRequestDto updateSessionRequestDto) {
         try {
             Session session = sessionRepository.findById(sessionId)
                     .orElseThrow(() -> new ApiRequestException(Constants.SESSION_NOT_FOUND));
-            Customer customer = customerRepository.findById(sessionRequestDTO.getCustomerId())
-                    .orElseThrow(() -> new ApiRequestException(Constants.CUSTOMER_NOT_FOUND));
             if(session.getStatus().equals(SessionStatus.X)){
                 throw new ApiRequestException(Constants.CANNOT_UPDATE);
             }
-            session.setSessionName(sessionRequestDTO.getSessionName());
-            session.setRemarks(sessionRequestDTO.getRemarks());
-            session.setCreatedBy(sessionRequestDTO.getCreatedBy());
-            session.setCustomer(customer);
+            session.setSessionName(updateSessionRequestDto.getSessionName());
+            session.setRemarks(updateSessionRequestDto.getRemarks());
             session.setUpdatedOn(LocalDateTime.now());
             Session updatedSession = sessionRepository.save(session);
             SessionResponseDTO sessionResponseDTO = modelMapper.map(updatedSession, SessionResponseDTO.class);
@@ -213,11 +206,22 @@ public class SessionServiceImpl implements SessionService {
             if(session.getStatus().equals(SessionStatus.X)){
                 throw new ApiRequestException(Constants.ALREADY_ARCHIVED);
             }
-            session.setStatus(SessionStatus.X);
-            sessionRepository.save(session);
-            deleteArchiveResponse.setMessage(Constants.ARCHIVED);
-            deleteArchiveResponse.setHttpStatus(HttpStatus.OK);
-            return deleteArchiveResponse;
+            if(session.getStatus().equals(SessionStatus.A)){
+                LocalDateTime updatedOn = session.getUpdatedOn();
+                LocalDateTime archiveDate = updatedOn.plusDays(maximumDormantDays);
+                if (archiveDate.isBefore(LocalDateTime.now())) {
+                    session.setStatus(SessionStatus.X);
+                    sessionRepository.save(session);
+                    deleteArchiveResponse.setMessage(Constants.ARCHIVED);
+                    deleteArchiveResponse.setHttpStatus(HttpStatus.OK);
+                    return deleteArchiveResponse;
+                } else {
+                    throw new ApiRequestException(Constants.NOT_ELIGIBLE_TO_ARCHIVE);
+                }
+            }
+            else {
+                throw new ApiRequestException(Constants.CANNOT_ARCHIVE);
+            }
         }
         catch (DataAccessException | TransactionException e) {
             throw new ServiceException(e.getMessage());

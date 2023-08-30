@@ -1,7 +1,6 @@
 package com.maveric.projectcharter.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,17 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SessionRequestDTO {
+public class UpdateSessionRequestDto {
 
     @NotBlank(message = "Session name is required")
     @Size(min = 4, message = "Session name must have at least 4 characters")
     private String sessionName;
-    @NotBlank(message = "Customer Id is required")
-    private String customerId;
-    @NotBlank(message = "Remarks are required")
+    @NotBlank(message = "Notes are required")
     @Size(min = 4, message = "Notes must be at least 4 characters")
     private String remarks;
-    @NotNull(message = "Created By RM NOT found")
-    private String createdBy;
-
 }
