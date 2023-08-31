@@ -55,6 +55,10 @@ public class Constants {
     public static final String PATH_VARIABLE_STATUS = "/{status}";
     public static final String PATH_VARIABLE_SESSION_ID = "/{sessionId}";
     public static final String PATH_VARIABLE_ARCHIVE = "/archive/{sessionId}";
+    public static final String PAGE_NO = "pageNo";
+    public static final String PAGE_NO_VALUE = "0";
+    public static final String PAGE_SIZE = "pageSize";
+    public static final String PAGE_SIZE_VALUE = "5";
 
     //Entity
     public static final String TABLE_SESSION = "session";

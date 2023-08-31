@@ -62,8 +62,8 @@ public class SessionController {
      */
     @GetMapping(Constants.PATH_VARIABLE_STATUS)
     public ResponseEntity<GetResponse<SessionResponseDTO>> getSessions
-    (@PathVariable String status, @RequestParam(name = "pageNo", defaultValue = "0") int offset,
-     @RequestParam(name = "pageSize", defaultValue = "5") int pageSize)
+    (@PathVariable String status, @RequestParam(name = Constants.PAGE_NO, defaultValue = Constants.PAGE_NO_VALUE) int offset,
+     @RequestParam(name = Constants.PAGE_SIZE, defaultValue = Constants.PAGE_SIZE_VALUE) int pageSize)
             throws ApiRequestException, ServiceException {
         Page<SessionResponseDTO> sessionResponseDTOPage = sessionService.getSessions(status, offset, pageSize);
         getResponse.setTotalElements(sessionResponseDTOPage.getTotalElements());
