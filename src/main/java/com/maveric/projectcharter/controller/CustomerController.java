@@ -1,5 +1,6 @@
 package com.maveric.projectcharter.controller;
 
+import com.maveric.projectcharter.config.Constants;
 import com.maveric.projectcharter.dto.CustomerDTO;
 import com.maveric.projectcharter.exception.ApiRequestException;
 import com.maveric.projectcharter.exception.ServiceException;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Validated
-@RequestMapping("/customer")
+@RequestMapping(Constants.CUSTOMER_MAPPING)
 public class CustomerController {
 
     @Autowired

@@ -16,32 +16,32 @@ public class LoggingAspect {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Before("execution(* com.maveric.projectcharter.controller.*.*(..))")
+    @Before(Constants.CONTROLLER)
     public void logBeforeControllerMethod(JoinPoint joinPoint) {
         logger.info(Constants.EXECUTING + joinPoint.getSignature().toShortString());
     }
 
-    @AfterReturning(pointcut = "execution(* com.maveric.projectcharter.controller.*.*(..))", returning = "result")
+    @AfterReturning(pointcut = Constants.CONTROLLER, returning = Constants.RESULT)
     public void logAfterControllerMethod(Object result) {
         logger.info(Constants.RESPONSE + result.toString());
     }
 
-    @AfterThrowing(pointcut = "execution(* com.maveric.projectcharter.controller.*.*(..))", throwing = "ex")
+    @AfterThrowing(pointcut = Constants.CONTROLLER, throwing = Constants.EX)
     public void logExceptionInController(JoinPoint joinPoint, Exception ex) {
         logger.error(Constants.EXCEPTION_IN + joinPoint.getSignature().toShortString() + Constants.EXCEPTION + ex.getMessage());
     }
 
-    @Before("execution(* com.maveric.projectcharter.service.*.*(..))")
+    @Before(Constants.SERVICE)
     public void logBeforeServiceMethod(JoinPoint joinPoint) {
         logger.info(Constants.EXECUTING + joinPoint.getSignature().toShortString());
     }
 
-    @AfterReturning(pointcut = "execution(* com.maveric.projectcharter.service.*.*(..))", returning = "result")
+    @AfterReturning(pointcut = Constants.SERVICE, returning = Constants.RESULT)
     public void logAfterServiceMethod(Object result) {
         logger.info(Constants.RESPONSE + result.toString());
     }
 
-    @AfterThrowing(pointcut = "execution(* com.maveric.projectcharter.service.*.*(..))", throwing = "ex")
+    @AfterThrowing(pointcut = Constants.SERVICE, throwing = Constants.EX)
     public void logExceptionInService(JoinPoint joinPoint, Exception ex) {
         logger.error(Constants.EXCEPTION_IN + joinPoint.getSignature().toShortString() + Constants.EXCEPTION + ex.getMessage());
     }

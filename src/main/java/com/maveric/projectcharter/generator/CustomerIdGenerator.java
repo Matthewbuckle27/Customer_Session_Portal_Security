@@ -27,9 +27,9 @@ public class CustomerIdGenerator implements IdentifierGenerator {
                     ResultSet rs = preparedStatement.executeQuery();
                     if (rs.next()) {
                         int nextValue = rs.getInt(1) + 1;
-                        generatedId[0] = Constants.PREFIX_CUSTOMER + String.format("%06d", nextValue);
+                        generatedId[0] = Constants.PREFIX_CUSTOMER + String.format(Constants.FORMAT, nextValue);
                     } else {
-                        generatedId[0] = Constants.PREFIX_CUSTOMER + "000001";
+                        generatedId[0] = Constants.PREFIX_CUSTOMER + Constants.PREFIX_FORMAT;
                     }
                 }
             }

@@ -6,11 +6,11 @@ import com.maveric.projectcharter.entity.Session;
 import com.maveric.projectcharter.entity.SessionHistory;
 import com.maveric.projectcharter.entity.SessionStatus;
 import com.maveric.projectcharter.exception.ApiRequestException;
+import com.maveric.projectcharter.exception.ServiceException;
 import com.maveric.projectcharter.repository.CustomerRepository;
 import com.maveric.projectcharter.repository.SessionHistoryRepository;
 import com.maveric.projectcharter.repository.SessionRepository;
 import com.maveric.projectcharter.service.impl.SessionServiceImpl;
-import org.hibernate.service.spi.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,14 +18,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.*;
+import org.springframework.dao.DataAccessException;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -52,12 +48,6 @@ class SessionServiceTest {
     @Spy
     private ModelMapper modelMapper;
 
-
-    @Value("${maximumDormantDays}")
-    private int maximumDormantDays;
-
-    @Value("${sortSessionsBy}")
-    private String sortSessionsBy;
 
     Customer customer = Customer.builder()
             .customerId("CB00001")
@@ -98,6 +88,18 @@ class SessionServiceTest {
         SessionResponseDTO result = sessionService.saveSession(sessionRequestDTO);
         assertNotNull(result);
         assertEquals(ArchiveFlag.N, result.getArchiveFlag());
+    }
+
+    @Test
+    void testSaveSession_ServiceException() {
+        SessionRequestDTO sessionRequestDTO = SessionRequestDTO.builder()
+                .sessionName("Test Session")
+                .customerId("CB00001")
+                .remarks("Open RD")
+                .createdBy("Gowtham")
+                .build();
+        when(customerRepository.findById(anyString())).thenThrow(mock(DataAccessException.class));
+        assertThrows(ServiceException.class, () -> sessionService.saveSession(sessionRequestDTO));
     }
 
     @Test
@@ -165,6 +167,16 @@ class SessionServiceTest {
     }
 
     @Test
+    void testUpdateSession_ServiceException() {
+        UpdateSessionRequestDto updateSessionRequestDto = UpdateSessionRequestDto.builder()
+                .sessionName("Test Updated Session")
+                .remarks("Open RD")
+                .build();
+        when(sessionRepository.findById(anyString())).thenThrow(mock(DataAccessException.class));
+        assertThrows(ServiceException.class, () -> sessionService.updateSession(anyString(),updateSessionRequestDto));
+    }
+
+    @Test
     void testDeleteSession() {
         Session session = Session.builder()
                 .sessionId("Session000123")
@@ -194,12 +206,6 @@ class SessionServiceTest {
         assertThrows(ApiRequestException.class, () -> sessionService.deleteSession(anyString()));
     }
 
-/*    @Test
-    void testDeleteSession_ServiceException(){
-        doThrow(new ServiceException("Failed to connect to database")).when(sessionRepository.findById(anyString()));
-        assertThrows(ServiceException.class, () -> sessionService.deleteSession(anyString()));
-    }*/
-
     @Test
     void testDeleteSession_CannotDelete() {
         Session session = Session.builder()
@@ -214,6 +220,12 @@ class SessionServiceTest {
                 .build();
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
         assertThrows(ApiRequestException.class, () -> sessionService.deleteSession(anyString()));
+    }
+
+    @Test
+    void testDeleteSession_ServiceException() {
+        when(sessionRepository.findById(anyString())).thenThrow(mock(DataAccessException.class));
+        assertThrows(ServiceException.class, () -> sessionService.deleteSession(anyString()));
     }
 
     @Test
@@ -262,4 +274,22 @@ class SessionServiceTest {
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
         assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
     }
+
+    @Test
+    void testArchiveSession_CannotArchive() {
+        Session session = Session.builder()
+                .sessionId("Session000123")
+                .sessionName("Test Session")
+                .customer(customer)
+                .status(SessionStatus.D)
+                .build();
+        when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
+        assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
+    }
+    @Test
+    void testArchiveSession_ServiceException() {
+        when(sessionRepository.findById(anyString())).thenThrow(mock(DataAccessException.class));
+        assertThrows(ServiceException.class, () -> sessionService.archiveSession(anyString()));
+    }
+
 }

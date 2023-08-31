@@ -3,6 +3,7 @@ package com.maveric.projectcharter.entity;
 import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.maveric.projectcharter.config.Constants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-@Table(name = "session")
+@Table(name = Constants.TABLE_SESSION)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,26 +20,26 @@ import org.hibernate.annotations.GenericGenerator;
 public class Session {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "session-id")
-    @GenericGenerator(name = "session-id", strategy = "com.maveric.projectcharter.generator.SessionIdGenerator")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = Constants.SESSION_ID)
+    @GenericGenerator(name = Constants.SESSION_ID, strategy = Constants.SESSION_STRATEGY)
     @Column(updatable = false, nullable = false)
     private String sessionId;
-    @Column(name = "Session_Name")
+    @Column(name = Constants.SESSION_NAME)
     private String sessionName;
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = Constants.CUSTOMER_ID)
     @JsonIgnore
     private Customer customer;
-    @Column(name = "Remarks")
+    @Column(name = Constants.REMARKS)
     private String remarks;
-    @Column(name = "created_By")
+    @Column(name = Constants.CREATED_BY)
     private String createdBy;
-    @Column(name = "Created_On")
+    @Column(name = Constants.CREATED_ON)
     private LocalDateTime createdOn;
-    @Column(name = "Updated_On")
+    @Column(name = Constants.UPDATE)
     private LocalDateTime updatedOn;
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
+    @Column(name = Constants.STATUS)
     private SessionStatus status;
 
     @PrePersist

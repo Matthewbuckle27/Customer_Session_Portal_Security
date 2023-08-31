@@ -1,6 +1,7 @@
 package com.maveric.projectcharter.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.maveric.projectcharter.config.Constants;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "session_history")
+@Table(name = Constants.TABLE_SESSION_HISTORY)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,23 +19,23 @@ import java.time.LocalDateTime;
 public class SessionHistory {
 
     @Id
-    @Column(name = "Session_Id")
+    @Column(name = Constants.SESSION_ID)
     private String sessionId;
-    @Column(name = "Session_Name")
+    @Column(name = Constants.SESSION_NAME)
     private String sessionName;
     @ManyToOne
-    @JoinColumn(name = "customer_id")
+    @JoinColumn(name = Constants.CUSTOMER_ID)
     @JsonIgnore
     private Customer customer;
-    @Column(name = "Remarks")
+    @Column(name = Constants.REMARKS)
     private String remarks;
-    @Column(name = "created_By")
+    @Column(name = Constants.CREATED_BY)
     private String createdBy;
-    @Column(name = "Created_On")
+    @Column(name = Constants.CREATED_ON)
     private LocalDateTime createdOn;
-    @Column(name = "Deleted_On")
+    @Column(name = Constants.DELETED_ON)
     private LocalDateTime deletedOn;
     @Enumerated(EnumType.STRING)
-    @Column(name = "Status")
+    @Column(name = Constants.STATUS)
     private SessionStatus status;
 }

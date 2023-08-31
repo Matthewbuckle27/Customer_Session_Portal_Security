@@ -17,8 +17,8 @@ public class SessionConfig {
 	@Bean
 	public OpenAPI myOpenAPI() {
 		return new OpenAPI()
-				.info(new Info().title("customer_session_portal")
-						.description("session_management_api")
-						.version("1.0"));
+				.info(new Info().title(Constants.SWAGGER_TITLE)
+						.description(Constants.SWAGGER_DESCRIPTION)
+						.version(Constants.SWAGGER_VERSION));
 	}
 }

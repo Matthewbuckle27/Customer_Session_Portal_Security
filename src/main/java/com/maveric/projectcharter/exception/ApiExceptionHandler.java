@@ -1,5 +1,6 @@
 package com.maveric.projectcharter.exception;
 
+import com.maveric.projectcharter.config.Constants;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,7 +23,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleApiRequestException(ApiRequestException exception) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ExceptionMessage exceptionMessage = new ExceptionMessage
-                ("API Exception", exception.getMessage(), httpStatus);
+                (Constants.API_EXCEPTION, exception.getMessage(), httpStatus);
         return new ResponseEntity<>(exceptionMessage, httpStatus);
     }
 
@@ -36,7 +37,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleServiceException(ServiceException exception) {
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         ExceptionMessage exceptionMessage = new ExceptionMessage
-                ("Service Exception", exception.getMessage(), httpStatus);
+                (Constants.SERVICE_EXCEPTION, exception.getMessage(), httpStatus);
         return new ResponseEntity<>(exceptionMessage, httpStatus);
     }
 
@@ -50,7 +51,7 @@ public class ApiExceptionHandler {
     public ResponseEntity<Object> handleNullPointerException(NullPointerException exception) {
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
         ExceptionMessage exceptionMessage = new ExceptionMessage
-                ("NullPointerException", exception.getMessage(), httpStatus);
+                (Constants.NULL_POINTER_EXCEPTION, exception.getMessage(), httpStatus);
         return new ResponseEntity<>(exceptionMessage, httpStatus);
     }
 

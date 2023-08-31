@@ -1,5 +1,6 @@
 package com.maveric.projectcharter.dto;
 
+import com.maveric.projectcharter.config.Constants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Data
 public class CustomerDTO {
 
-    @NotBlank(message = "Customer name is required")
-    @Size(min = 3, message = "Customer name must have at least 3 characters")
+    @NotBlank(message = Constants.CUSTOMER_NAME_REQUIRED)
+    @Size(min = 3, message = Constants.CUSTOMER_NAME_LENGTH)
     private String name;
-    @NotBlank(message = "Email is required")
+    @NotBlank(message = Constants.CUSTOMER_EMAIL_REQUIRED)
     private String email;
 
 }

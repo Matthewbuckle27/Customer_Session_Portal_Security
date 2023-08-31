@@ -1,5 +1,6 @@
 package com.maveric.projectcharter.dto;
 
+import com.maveric.projectcharter.config.Constants;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -13,10 +14,10 @@ import lombok.NoArgsConstructor;
 @Builder
 public class UpdateSessionRequestDto {
 
-    @NotBlank(message = "Session name is required")
-    @Size(min = 4, message = "Session name must have at least 4 characters")
+    @NotBlank(message = Constants.SESSION_NAME_REQUIRED)
+    @Size(min = 4, message = Constants.SESSION_NAME_LENGTH)
     private String sessionName;
-    @NotBlank(message = "Notes are required")
-    @Size(min = 4, message = "Notes must be at least 4 characters")
+    @NotBlank(message = Constants.REMARKS_REQUIRED)
+    @Size(min = 4, message = Constants.REMARKS_LENGTH)
     private String remarks;
 }

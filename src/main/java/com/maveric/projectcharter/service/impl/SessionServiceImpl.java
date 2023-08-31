@@ -51,12 +51,12 @@ public class SessionServiceImpl implements SessionService {
 
     public SessionServiceImpl() {
         this.maximumDormantDays = 10;
-        this.sortSessionsBy = "updatedOn";
+        this.sortSessionsBy = Constants.UPDATED_ON;
     }
 
     @Autowired
-    public SessionServiceImpl(@Value("${maximumDormantDays}") int maximumDormantDays,
-                              @Value("${sortSessionsBy}") String sortSessionsBy) {
+    public SessionServiceImpl(@Value(Constants.MAXIMUM_DORMANT_DAYS) int maximumDormantDays,
+                              @Value(Constants.SORT_BY) String sortSessionsBy) {
         this.maximumDormantDays = maximumDormantDays;
         this.sortSessionsBy = sortSessionsBy;
     }
