@@ -14,6 +14,8 @@ import com.maveric.projectcharter.repository.SessionRepository;
 import com.maveric.projectcharter.service.SessionService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -48,6 +50,7 @@ public class SessionServiceImpl implements SessionService {
 
     private final int maximumDormantDays;
     private final String sortSessionsBy;
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public SessionServiceImpl() {
         this.maximumDormantDays = 10;
@@ -81,7 +84,8 @@ public class SessionServiceImpl implements SessionService {
             return sessionResponseDTO;
         }
         catch (DataAccessException | TransactionException e) {
-            throw new ServiceException(e.getMessage());
+            logger.error(e.getMessage());
+            throw new ServiceException("Unable to Create Session");
         }
     }
 
@@ -90,20 +94,20 @@ public class SessionServiceImpl implements SessionService {
      *
      * @param status The status of sessions to retrieve.
      * @param offset        The starting index of the page.
-     * @param pagesize      The number of items to retrieve per page.
+     * @param pageSize      The number of items to retrieve per page.
      * @return A Page of SessionResponseDTO objects containing paginated session information.
      * @throws ApiRequestException if there's an issue with the API request or if session information is not found.
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @Override
-    public Page<SessionResponseDTO> getSessions(String status, int offset, int pagesize) {
+    public Page<SessionResponseDTO> getSessions(String status, int offset, int pageSize) {
 
         try {
             if(!(status.equalsIgnoreCase(Constants.SESSION_STATUS_A)||status.equalsIgnoreCase(Constants.SESSION_STATUS_X))){
                 throw new ApiRequestException(Constants.WRONG_STATUS);
             }
             SessionStatus sessionStatus = SessionStatus.valueOf(status.toUpperCase());
-            Pageable pageable = PageRequest.of(offset, pagesize)
+            Pageable pageable = PageRequest.of(offset, pageSize)
                     .withSort(Sort.by(sortSessionsBy).descending());
             Page<Session> sessions = sessionRepository.findByStatus(sessionStatus, pageable);
             if (sessions.isEmpty()) {
@@ -127,7 +131,8 @@ public class SessionServiceImpl implements SessionService {
             return sessionResponseDTOS;
         }
         catch (DataAccessException | TransactionException e) {
-            throw new ServiceException(e.getMessage());
+            logger.error(e.getMessage());
+            throw new ServiceException("Unable to Load Sessions");
         }
 
     }
@@ -158,7 +163,8 @@ public class SessionServiceImpl implements SessionService {
             return sessionResponseDTO;
         }
         catch (DataAccessException | TransactionException e) {
-            throw new ServiceException(e.getMessage());
+            logger.error(e.getMessage());
+            throw new ServiceException("Unable to Update Session");
         }
     }
 
@@ -187,7 +193,8 @@ public class SessionServiceImpl implements SessionService {
             return deleteArchiveResponse;
         }
         catch (DataAccessException | TransactionException e) {
-            throw new ServiceException(e.getMessage());
+            logger.error(e.getMessage());
+            throw new ServiceException("Unable to Delete Session");
         }
     }
 
@@ -225,7 +232,8 @@ public class SessionServiceImpl implements SessionService {
             }
         }
         catch (DataAccessException | TransactionException e) {
-            throw new ServiceException(e.getMessage());
+            logger.error(e.getMessage());
+            throw new ServiceException("Unable to Archive Session");
         }
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 
 public interface SessionService {
     SessionResponseDTO saveSession(SessionRequestDTO sessionRequestDTO);
-    Page<SessionResponseDTO> getSessions(String status, int offset, int pagesize);
+    Page<SessionResponseDTO> getSessions(String status, int offset, int pageSize);
     SessionResponseDTO updateSession(String sessionId, UpdateSessionRequestDto updateSessionRequestDto);
     DeleteArchiveResponse deleteSession(String sessionId);
     DeleteArchiveResponse archiveSession(String sessionId);
