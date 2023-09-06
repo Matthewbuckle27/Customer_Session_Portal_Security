@@ -16,6 +16,11 @@ public class Constants {
     public static final String NOT_ELIGIBLE_TO_ARCHIVE = "Session is not eligible to archive";
     public static final String CANNOT_ARCHIVE = "Cannot Archive Session";
     public static final String CUSTOMER_CREATED = "Customer Created";
+    public static final String UNABLE_TO_CREATE = "Unable to Create Session";
+    public static final String UNABLE_TO_UPDATE = "Unable to Update Session";
+    public static final String UNABLE_TO_GET = "Unable to Load Sessions";
+    public static final String UNABLE_TO_DELETE = "Unable to Delete Session";
+    public static final String UNABLE_TO_ARCHIVE = "Unable to Archive Session";
 
     //ID Generator
     public static final String PREFIX_SESSION = "Session";

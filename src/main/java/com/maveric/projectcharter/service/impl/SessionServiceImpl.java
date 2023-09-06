@@ -85,7 +85,7 @@ public class SessionServiceImpl implements SessionService {
         }
         catch (DataAccessException | TransactionException e) {
             logger.error(e.getMessage());
-            throw new ServiceException("Unable to Create Session");
+            throw new ServiceException(Constants.UNABLE_TO_CREATE);
         }
     }
 
@@ -132,7 +132,7 @@ public class SessionServiceImpl implements SessionService {
         }
         catch (DataAccessException | TransactionException e) {
             logger.error(e.getMessage());
-            throw new ServiceException("Unable to Load Sessions");
+            throw new ServiceException(Constants.UNABLE_TO_GET);
         }
 
     }
@@ -164,7 +164,7 @@ public class SessionServiceImpl implements SessionService {
         }
         catch (DataAccessException | TransactionException e) {
             logger.error(e.getMessage());
-            throw new ServiceException("Unable to Update Session");
+            throw new ServiceException(Constants.UNABLE_TO_UPDATE);
         }
     }
 
@@ -194,7 +194,7 @@ public class SessionServiceImpl implements SessionService {
         }
         catch (DataAccessException | TransactionException e) {
             logger.error(e.getMessage());
-            throw new ServiceException("Unable to Delete Session");
+            throw new ServiceException(Constants.UNABLE_TO_DELETE);
         }
     }
 
@@ -233,7 +233,7 @@ public class SessionServiceImpl implements SessionService {
         }
         catch (DataAccessException | TransactionException e) {
             logger.error(e.getMessage());
-            throw new ServiceException("Unable to Archive Session");
+            throw new ServiceException(Constants.UNABLE_TO_ARCHIVE);
         }
     }
 }
