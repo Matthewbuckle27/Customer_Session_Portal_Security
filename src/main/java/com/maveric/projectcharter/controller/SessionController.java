@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +42,8 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @PostMapping
-    public ResponseEntity<CreateUpdateResponse> createSession(@RequestBody @Valid SessionRequestDTO sessionRequestDTO)
-            throws ApiRequestException, ServiceException {
+    @PreAuthorize("hasAuthority('RM')")
+    public ResponseEntity<CreateUpdateResponse> createSession(@RequestBody @Valid SessionRequestDTO sessionRequestDTO) throws ApiRequestException, ServiceException {
         SessionResponseDTO sessionResponseDTO = sessionService.saveSession(sessionRequestDTO);
         createUpdateResponse.setMessage(Constants.CREATED);
         createUpdateResponse.setHttpStatus(HttpStatus.CREATED);
@@ -61,10 +62,8 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @GetMapping(Constants.PATH_VARIABLE_STATUS)
-    public ResponseEntity<GetResponse<SessionResponseDTO>> getSessions
-    (@PathVariable String status, @RequestParam(name = Constants.PAGE_NO, defaultValue = Constants.PAGE_NO_VALUE) int offset,
-     @RequestParam(name = Constants.PAGE_SIZE, defaultValue = Constants.PAGE_SIZE_VALUE) int pageSize)
-            throws ApiRequestException, ServiceException {
+    @PreAuthorize("hasAuthority('RM')")
+    public ResponseEntity<GetResponse<SessionResponseDTO>> getSessions(@PathVariable String status, @RequestParam(name = Constants.PAGE_NO, defaultValue = Constants.PAGE_NO_VALUE) int offset, @RequestParam(name = Constants.PAGE_SIZE, defaultValue = Constants.PAGE_SIZE_VALUE) int pageSize) throws ApiRequestException, ServiceException {
         Page<SessionResponseDTO> sessionResponseDTOPage = sessionService.getSessions(status, offset, pageSize);
         getResponse.setTotalElements(sessionResponseDTOPage.getTotalElements());
         getResponse.setTotalPages(sessionResponseDTOPage.getTotalPages());
@@ -75,15 +74,15 @@ public class SessionController {
     /**
      * Controller method to update a session identified by the provided session ID.
      *
-     * @param sessionId         The ID of the session to be updated.
+     * @param sessionId               The ID of the session to be updated.
      * @param updateSessionRequestDto The data to update the session with, in the form of a SessionRequestDTO.
      * @return A ResponseEntity containing a CustomResponse with details about the operation's outcome.
      * @throws ApiRequestException If there is an issue with the API request.
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @PutMapping(Constants.PATH_VARIABLE_SESSION_ID)
-    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable @NotNull String sessionId, @RequestBody @Valid UpdateSessionRequestDto updateSessionRequestDto)
-            throws ApiRequestException, ServiceException {
+    @PreAuthorize("hasAuthority('RM')")
+    public ResponseEntity<CreateUpdateResponse> updateSession(@PathVariable @NotNull String sessionId, @RequestBody @Valid UpdateSessionRequestDto updateSessionRequestDto) throws ApiRequestException, ServiceException {
         SessionResponseDTO sessionResponseDTO = sessionService.updateSession(sessionId, updateSessionRequestDto);
         createUpdateResponse.setMessage(Constants.UPDATED);
         createUpdateResponse.setHttpStatus(HttpStatus.OK);
@@ -100,8 +99,8 @@ public class SessionController {
      * @throws ServiceException    If there is an issue in the service layer during processing.
      */
     @DeleteMapping(Constants.PATH_VARIABLE_SESSION_ID)
-    public ResponseEntity<DeleteArchiveResponse> deleteSession(@PathVariable @NotNull String sessionId)
-            throws ApiRequestException, ServiceException {
+    @PreAuthorize("hasAuthority('RM')")
+    public ResponseEntity<DeleteArchiveResponse> deleteSession(@PathVariable @NotNull String sessionId) throws ApiRequestException, ServiceException {
         deleteArchiveResponse = sessionService.deleteSession(sessionId);
         return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
     }
@@ -115,8 +114,8 @@ public class SessionController {
      * @throws ServiceException    If there is an issue with the service while archiving the session.
      */
     @PutMapping(Constants.PATH_VARIABLE_ARCHIVE)
-    public ResponseEntity<DeleteArchiveResponse> archiveSession(@PathVariable @NotNull String sessionId)
-            throws ApiRequestException, ServiceException {
+    @PreAuthorize("hasAuthority('RM')")
+    public ResponseEntity<DeleteArchiveResponse> archiveSession(@PathVariable @NotNull String sessionId) throws ApiRequestException, ServiceException {
         deleteArchiveResponse = sessionService.archiveSession(sessionId);
         return new ResponseEntity<>(deleteArchiveResponse, HttpStatus.OK);
     }

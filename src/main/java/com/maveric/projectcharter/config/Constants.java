@@ -64,6 +64,13 @@ public class Constants {
     public static final String PAGE_NO_VALUE = "0";
     public static final String PAGE_SIZE = "pageSize";
     public static final String PAGE_SIZE_VALUE = "5";
+    public static final String USER_MAPPING = "/user";
+    public static final String CREATE_USER_MAPPING = "/createUser";
+    public static final String AUTHENTICATE_USER_MAPPING = "/authenticate";
+    public static final String INVALID_USER = "Invalid User, please enter correct username";
+    public static final String USER_MAPPING = "/user";
+    public static final String USER_MAPPING = "/user";
+
 
     //Entity
     public static final String TABLE_SESSION = "session";

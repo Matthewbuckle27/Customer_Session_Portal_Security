@@ -249,7 +249,7 @@ class SessionServiceTest {
         Session session = Session.builder()
                 .sessionId("Session000123")
                 .sessionName("Test Session")
-                .updatedOn(LocalDateTime.parse("2023-08-28T14:52:01.733428"))
+                .updatedOn(LocalDateTime.parse("2023-09-06T14:52:01.733428"))
                 .customer(customer)
                 .status(SessionStatus.A)
                 .build();
@@ -286,6 +286,7 @@ class SessionServiceTest {
         when(sessionRepository.findById(anyString())).thenReturn(Optional.of(session));
         assertThrows(ApiRequestException.class, () -> sessionService.archiveSession(anyString()));
     }
+
     @Test
     void testArchiveSession_ServiceException() {
         when(sessionRepository.findById(anyString())).thenThrow(mock(DataAccessException.class));
